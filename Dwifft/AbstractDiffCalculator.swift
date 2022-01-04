@@ -75,7 +75,13 @@ public class AbstractDiffCalculator<Section: Equatable, Value: Equatable> {
             let newSectionedValues = newValue
             let diff = Dwifft.diff(lhs: oldSectionedValues, rhs: newSectionedValues)
             if (diff.count > 0) {
-                self.processChanges(newState: newSectionedValues, diff: diff)
+                if Thread.isMainThread {
+                    self.processChanges(newState: newSectionedValues, diff: diff)
+                } else {
+                    DispatchQueue.main.async {
+                        self.processChanges(newState: newSectionedValues, diff: diff)
+                    }
+                }
             }
         }
     }
